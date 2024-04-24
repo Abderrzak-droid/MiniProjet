@@ -1,0 +1,59 @@
+{% load static %}
+<!DOCTYPE html>
+
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8">
+    <title> Adding New Schedule | Brahim/Hamza </title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   </head>
+<body>
+  <div class="container">
+    <div class="title">New Schedule</div>
+    <div class="content">
+      <form action="{% url 'results' %}" method="post">
+        {% csrf_token %}
+        <div class="user-details">
+          <div class="input-box">
+            <span class="details">Name Of Schedule</span>
+            <input type="text" name="name_scan"   placeholder="Enter your name" required>
+          </div>
+          <div class="input-box">
+            <span class="details">Reccurence :</span>
+            <select id="recurrence" name="recurrence">
+                <option value="none">Une seule fois</option>
+                <option value="daily">Quotidienne</option>
+                <option value="weekly">Hebdomadaire</option>
+                <option value="monthly">Mensuelle</option>
+                <option value="yearly">Annuelle</option>
+
+            </select>
+          </div>
+          <div class="input-box">
+            <span class="details">Start :</span>
+            <input type="datetime-local" id="start_time" name="start_time" value="2024-04-20T19:48">
+          </div>
+        
+        </div>  
+
+        <div class="button">
+          <input type="submit" value="Register">
+        </div>
+      </form>
+    </div>
+  </div>
+  {% if form.errors %}
+  <div style="color: red;">
+      <strong>Error{{ form.errors|pluralize }} occurred:</strong>
+      <ul>
+          {% for field, errors in form.errors.items %}
+              {% for error in errors %}
+                  <li>{{ field|title }}: {{ error }}</li>
+              {% endfor %}
+          {% endfor %}
+      </ul>
+  </div>
+{% endif %}
+</body>
+</html>

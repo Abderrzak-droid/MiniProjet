@@ -1,0 +1,86 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'style3.css' %}">
+    <title>Document</title>
+</head>
+<body>
+    <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Status</th>
+              <th>Reports</th>
+              <th>Last Report</th>
+              <th>Severity</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Different Scan</td>
+              <td><span class="status done">Done</span></td>
+              <td>1</td>
+              <td>Thu, Oct 12, 2023 1:42 PM UTC</td>
+              <td><span class="severity na">N/A</span></td>
+              <td></td>
+            
+            </tr>
+            <tr>
+              <td>Full Scan</td>
+              <td><span class="status done">Done</span></td>
+              <td>1</td>
+              <td>Thu, Oct 12, 2023 12:54 PM UTC</td>
+              <td><span class="severity low">2.8 (low)</span></td>
+              <td></td>
+            
+            </tr>
+            <tr>
+              <td>range Scan</td>
+              <td><span class="status stopped">Stopped at 71%</span></td>
+              <td>1</td>
+              <td>Tue, Nov 7, 2023 8:45 AM UTC</td>
+              <td><span class="severity high">10.0 (high)</span></td>
+              <td></td>
+            
+            </tr>
+            <tr>
+              <td>test final8</td>
+              <td><span class="status done">Done</span></td>
+              <td>1</td>
+              <td>Tue, Nov 7, 2023 8:45 AM UTC</td>
+              <td><span class="severity high">10.0 (high)</span></td>
+              <td></td>
+            
+            </tr>
+            <tr>
+              <td>test pratique</td>
+              <td><span class="status stopped">Stopped at 9%</span></td>
+              <td>1</td>
+              <td></td>
+              <td></td>
+              
+              
+            </tr>
+            <tr>
+              <td>ip6</td>
+              <td><span class="status done">Done</span></td>
+              <td>1</td>
+              <td>Mon, Nov 13, 2023 12:54 PM UTC</td>
+              <td><span class="severity high">10.0 (high)</span></td>
+              
+            </tr>
+          </tbody>
+        </table>
+        <div class="pagination">
+          <span>Applied filters: apply_overrides=0 min_qod=70 sort=name first=1 rows=10</span>
+          <button class="pagination-btn">&lt;&lt;</button>
+          <span class="page-number">1 - 6 of 6</span>
+          <button class="pagination-btn">&gt;&gt;</button>
+        </div>
+      </div>
+</body>
+</html>

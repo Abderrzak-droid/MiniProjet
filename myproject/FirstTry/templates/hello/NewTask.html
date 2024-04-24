@@ -1,0 +1,92 @@
+{% load static %}
+<!DOCTYPE html>
+
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8">
+    <title> Adding New Task | Brahim/Hamza </title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   </head>
+<body>
+  <div class="container">
+    <div class="title">New Task</div>
+    <div class="content">
+      <form action="{% url 'results' %}" method="post">
+        {% csrf_token %}
+        <div class="user-details">
+          <div class="input-box">
+            <span class="details">Name Of Scan</span>
+            <input type="text" name="name"   placeholder="Enter your name" required>
+          </div>
+          <div class="input-box">
+            <span class="details">Scan Target(s)</span>
+            <input type="text" name="ip_address" maxlength="15" placeholder="IP Address" required="" id="id_ip_address">
+          </div>
+          <div class="input-box">
+            <span class="details">Schedule</span>
+            <select>
+               <option>lyoum</option>
+               <option>ghoudwa</option>
+               <option>7na</option>
+            </select>
+          </div>
+          <div class="input-box">
+            <span class="details">Scan Type</span>
+            <select name="scan_type" id="id_scan_type">
+                <option value="-sT">Tcp ping</option>
+                <option value="-O">OS detection</option>
+               <option>Log4Shell</option>
+              </select>
+          </div>
+        
+          <div class="input-box">
+            <span class="details">DataBase</span>
+            <select name="dataBase" id="id_dataBase">
+              <option value="Simple Scan">Simple Scan</option>
+                <option value="vuln">Vuln</option>
+                <option value="vulners">Vulners</option>
+                <option value="vulnscan">VulnScan</option>
+              </select>
+          </div>
+        </div>  
+        <div class="gender-details">
+            <span class="details"><b >Auto Delete Reports</b></span>
+            <input type="radio" name="gender" id="dot-1">
+            <input type="radio" name="gender" id="dot-2">
+            <input type="radio" name="gender" id="dot-3">
+         
+       
+          
+          <div class="category">
+            <label for="dot-1">
+            <span class="dot one"></span>
+            <span class="gender">Yes</span>
+          </label>
+          <label for="dot-2">
+            <span class="dot two"></span>
+            <span class="gender">No</span>
+          </label>
+   
+          </div>
+        </div>
+        <div class="button">
+          <input type="submit" value="Register">
+        </div>
+      </form>
+    </div>
+  </div>
+  {% if form.errors %}
+  <div style="color: red;">
+      <strong>Error{{ form.errors|pluralize }} occurred:</strong>
+      <ul>
+          {% for field, errors in form.errors.items %}
+              {% for error in errors %}
+                  <li>{{ field|title }}: {{ error }}</li>
+              {% endfor %}
+          {% endfor %}
+      </ul>
+  </div>
+{% endif %}
+</body>
+</html>

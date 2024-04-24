@@ -1,0 +1,66 @@
+
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="author" content="CodeHim">
+      <title> Résultats du scan Nmap </title>
+      <!-- Style CSS -->
+      {% load static %}
+      <link rel="stylesheet" href="{% static 'style2.css' %}">
+      <!-- Demo CSS (No need to include it into your project) -->
+      
+      <!-- Bootstrap 5 CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
+<!-- Data Table CSS -->
+<link rel='stylesheet' href='https://cdn.datatables.net/1.13.5/css/dataTables.bootstrap5.min.css'>
+<!-- Font Awesome CSS -->
+<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css'>
+   </head>
+   <body>
+      <header class="cd__intro">
+         <h1> Résultats du scan Nmap </h1>
+        <br>
+        <div class="cd__action">
+            <a href="{%url 'home'%}" title="Back to Home" class="cd__btn back">Back to Home</a>
+         </div>
+      </header>
+      <!--$%adsense%$-->
+      <main class="cd__main">
+         <!-- Start DEMO HTML (Use the following code into your project)-->
+         <table id="example" class="table table-striped" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Vulnerability</th>
+                    <th>sevérité</th>
+                    <th>Type de vuln</th>
+                    <th>Is Exploitable</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for port_info in ports_info %}
+                <tr>
+                    <td>{{ port_info.id }}</td>
+                    <td>{{ port_info.cvss }}</td>
+                    <td>{{ port_info.type }}</td>
+                    <td>{{ port_info.is_exploit }}</td>
+                    
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+         <!-- END EDMO HTML (Happy Coding!)-->
+      </main>
+      
+      <!-- jQuery -->
+<script src='https://code.jquery.com/jquery-3.7.0.js'></script>
+<!-- Data Table JS -->
+<script src='https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js'></script>
+<script src='https://cdn.datatables.net/responsive/2.1.0/js/dataTables.responsive.min.js'></script>
+<script src='https://cdn.datatables.net/1.13.5/js/dataTables.bootstrap5.min.js'></script>
+      <!-- Script JS -->
+      <script src="{% static 'js/script.js' %}"></script>
+      <!--$%analytics%$-->
+   </body>
+</html>

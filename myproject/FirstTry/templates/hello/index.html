@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scanneur Nmap</title>
+</head>
+<body>
+    <h2>Spécifiez votre machine  et votre scan :</h2>
+    <form  method="post" action="{% url 'results' %}">
+        {% csrf_token %}
+        {{ scan_form.as_p}}
+        <button type="submit">Exécuter</button>
+    </form>
+</body>
+</html>

@@ -1,0 +1,81 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Home</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300,700' rel='stylesheet' type='text/css'>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+</head>
+<body>
+<section class="ftco-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h3 class="h5 mb-4 text-center">Acceuil</h3>
+                <div class="table-wrap">
+                    <a href="{% url 'NewTask' %}">New Task</a>
+                    <table class="table myaccordion table-hover" id="accordion">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Status</th>
+                            <th>IP Address</th>
+                            <th>&nbsp;</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for scan in data %}
+                        <tr data-toggle="collapse" data-target="#collapse{{ scan.id }}" aria-expanded="false"
+                            aria-controls="collapse{{ scan.id }}">
+                            <th scope="row">{{ scan.id }}</th>
+                            <td>{{ scan.name_scan }}</td>
+                            <td>{{ scan.status }}</td>
+                            <td>{{ scan.ip_address_scan }}</td>
+                            <td>
+                                <i class="fa fa-chevron-down" aria-hidden="true"></i>
+                            </td>
+                        </tr>
+                        <tr id="collapse{{ scan.id }}" class="collapse acc" data-parent="#accordion">
+                            <td colspan="5">
+                                <p>
+                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Porro iste, facere sunt
+                                    sequi nostrum ipsa, amet doloremque magnam reiciendis tempore sapiente.
+                                    Necessitatibus recusandae harum nam sit perferendis quia inventore natus.
+                                </p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script src="{% static 'js/popper.js' %}"></script>
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
+<script src="{% static 'js/main.js' %}"></script>
+
+<script>
+    // Change icon on collapse/expand
+    $('.myaccordion').on('hide.bs.collapse', function (e) {
+        $(e.target).prev('tr').find('i').removeClass('fa-chevron-up').addClass('fa-chevron-down');
+    });
+
+    $('.myaccordion').on('show.bs.collapse', function (e) {
+        $(e.target).prev('tr').find('i').removeClass('fa-chevron-down').addClass('fa-chevron-up');
+    });
+</script>
+
+</body>
+</html>
