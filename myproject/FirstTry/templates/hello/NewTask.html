@@ -24,12 +24,18 @@
             <input type="text" name="ip_address" maxlength="15" placeholder="IP Address" required="" id="id_ip_address">
           </div>
           <div class="input-box">
-            <span class="details">Schedule</span>
-            <select>
-               <option>lyoum</option>
-               <option>ghoudwa</option>
-               <option>7na</option>
+            <label for="end_time">Commence l'exécution à </label>
+            <input type="datetime-local" id="start_time" name="start_time" value="2024-04-26T16:23">
+            <br>
+            <label for="recurrence">Récurrence</label>
+            <select id="recurrence" name="recurrence">
+            <option value="monthly">Mensuelle</option>
+            <option value="daily">Quotidienne</option>
+            <option value="weekly">Hebdomadaire</option>
+            <option value="yearly">Annuelle</option>
+            <option value="none">Une seule fois</option>
             </select>
+            <br>
           </div>
           <div class="input-box">
             <span class="details">Scan Type</span>
@@ -41,7 +47,7 @@
           </div>
         
           <div class="input-box">
-            <span class="details">DataBase</span>
+            <span class="details">Data Base</span>
             <select name="dataBase" id="id_dataBase">
               <option value="Simple Scan">Simple Scan</option>
                 <option value="vuln">Vuln</option>
@@ -50,43 +56,12 @@
               </select>
           </div>
         </div>  
-        <div class="gender-details">
-            <span class="details"><b >Auto Delete Reports</b></span>
-            <input type="radio" name="gender" id="dot-1">
-            <input type="radio" name="gender" id="dot-2">
-            <input type="radio" name="gender" id="dot-3">
-         
-       
-          
-          <div class="category">
-            <label for="dot-1">
-            <span class="dot one"></span>
-            <span class="gender">Yes</span>
-          </label>
-          <label for="dot-2">
-            <span class="dot two"></span>
-            <span class="gender">No</span>
-          </label>
-   
-          </div>
-        </div>
         <div class="button">
           <input type="submit" value="Register">
         </div>
       </form>
     </div>
   </div>
-  {% if form.errors %}
-  <div style="color: red;">
-      <strong>Error{{ form.errors|pluralize }} occurred:</strong>
-      <ul>
-          {% for field, errors in form.errors.items %}
-              {% for error in errors %}
-                  <li>{{ field|title }}: {{ error }}</li>
-              {% endfor %}
-          {% endfor %}
-      </ul>
-  </div>
-{% endif %}
+
 </body>
 </html>

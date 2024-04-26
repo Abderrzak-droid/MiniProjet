@@ -2,18 +2,32 @@ from django.db import models
 from django.utils import timezone
 
 # Create your models here.
-class Result(models.Model):
-    vulnerability = models.CharField(max_length=100)
-    severity = models.CharField(max_length=50)
-    host_ip = models.CharField(max_length=15)
-    host_name = models.CharField(max_length=100)
-    time = models.DateTimeField()
-
+class ResultVulners(models.Model): 
+    cvss =  models.CharField(max_length=20)
+    type =  models.CharField(max_length=20)
+    is_exploit  =  models.CharField(max_length=20)
+    nameVuln =  models.CharField(max_length=50)
+                   
 class Scan(models.Model):
     name = models.CharField(max_length=15)
     ip_address = models.CharField(max_length=15)
     scan_type = models.CharField(max_length = 20)
     dataBase = models.CharField(max_length=15)
+    start_time = models.DateTimeField(default=timezone.now)
+
+    RECURRENCE_CHOICES = (
+        ("monthly", "Mensuelle"),
+        ("daily", "Quotidienne"),
+        ("weekly", "Hebdomadaire"),
+        ("yearly", "Annuelle"),
+        ("none", "Une seule fois"),
+    )
+    recurrence = models.CharField(max_length=10, choices=RECURRENCE_CHOICES, default="monthly")
+
+class ResultatTCP(models.Model):
+    port = models.CharField(max_length=10)
+    etat= models.CharField(max_length=10)
+    service = models.CharField(max_length=20)
 
 class Home(models.Model):
     name_scan = models.CharField(max_length=20)

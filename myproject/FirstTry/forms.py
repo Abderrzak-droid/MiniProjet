@@ -1,7 +1,7 @@
 from django.forms import ModelForm
 from . import models
 from .models import Scan , dateasyn
-from .models import Result,Home
+from .models import ResultVulners,Home,ResultatTCP
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
@@ -18,12 +18,17 @@ class LoginForm(forms.Form):
 class ScanForm(ModelForm):
   class Meta:
     model = Scan
-    fields = ('name','ip_address', 'scan_type','dataBase')
+    fields = ('name','ip_address', 'scan_type','dataBase','start_time','recurrence',)
     
-class ResultatForm(ModelForm):
+class ResultatVulnersForm(ModelForm):
   class Meta:
-    model = Result
-    fields = ('vulnerability', 'severity','host_ip','host_name','time',)
+    model = ResultVulners
+    fields = ('nameVuln', 'cvss','type','is_exploit',)
+
+class ResultatTCPForm(ModelForm):
+  class Meta:
+    model = ResultatTCP
+    fields = ('port', 'etat','service')
 
 class HomeForm(ModelForm):
   class Meta:
