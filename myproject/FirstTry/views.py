@@ -13,7 +13,7 @@ from celery.result import AsyncResult
 # Create your views here.
 
 
-app = Celery('mysite', backend='redis://localhost')
+app = Celery('myproject', backend='redis://localhost')
 
 def user_signup(request):
     if request.method == 'POST':
@@ -65,6 +65,7 @@ def indexwithout(request):
 def AddTask(request):
     return render(request,"hello/NewTask.html")
 
+@shared_task
 def runCommand(scanForm) :
     
     Type = scanForm['scan_type']
@@ -171,30 +172,10 @@ def your_view(request):
             print("current:", current_datetime.strftime("%Y-%m-%d %H:%M:%S"))
 
             ports_info_result = scheduled_periodic_scan.apply_async(args=(scanForm_serializable,), countdown=time_diff)
-            
-            Data = scanForm_serializable['dataBase']
-            match Data:
-        
-                case "vuln":
-                    
-                    return HttpResponse(Data)
-                            
-                case "vulners":
-                    resultats = ResultatVulnersForm({
-                    'vulnerability' : ports_info_result['nameVuln']
-                    ,'severity' : ports_info_result['cvss']
-                    ,'type' : ports_info_result['type']
-                    ,'is_exploit': ports_info_result['is_exploit'],}
-                )
 
-                case "Simple Scan":
-                    resultats = ResultatTCPForm({'port': ports_info_result['port'],
-                            'state': ports_info_result['state'],
-                            'service': ports_info_result['service'],
-                            })
-            resultats.save()
 
-            return render(request,'hello/DisplayScans.html') # Redirect to status polling view
+            data = Home.objects.all()
+            return render(request,'hello/DisplayScans.html',{'data': data}) # Redirect to status polling view
         else:
             return HttpResponse("scan n'est pas valide")
         
@@ -202,7 +183,7 @@ def your_view(request):
 
 # views.py
 from django.http import JsonResponse
-from celery.result import AsyncResult
+
 
 def check_task_result(request):
     # Get the task ID from the session or database
@@ -234,6 +215,7 @@ def check_task_result(request):
 
     return JsonResponse(notification)
 
+@shared_task
 def parseNmapXmlCaseVulners(xml_file):
 
     
@@ -271,7 +253,7 @@ def parseNmapXmlCaseVulners(xml_file):
 
         return extracted_table 
     
-
+@shared_task
 def parseNmapXmlCaseTcpPing(xml_file):
     try:
         tree = ET.parse(xml_file)
@@ -329,10 +311,23 @@ def parseNmapXmlCaseTcpPing(xml_file):
 def scheduled_periodic_scan(scanForm):
     
         print("Initial scheduled scan started at:", datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-        runCommand(scanForm)
         Data = scanForm['dataBase']
+        Type = scanForm['scan_type']
+        db = scanForm["dataBase"]
+        IpAddress = scanForm["ip_address"]
+        if db == "Simple Scan":
+            command = "nmap -oX output.xml "+ Type +" "+ IpAddress
+        else:
+            command = "nmap -oX output.xml -sV --script "+db+" "+IpAddress
+
+        try:
+            subprocess.run(command, shell=True, check=True)
+            
+        except subprocess.CalledProcessError as e:
+            print(e)
+            
         xml_file_path = 'output.xml'
-        match Data:
+        match db:
     
             case "vuln":
                 
@@ -341,9 +336,31 @@ def scheduled_periodic_scan(scanForm):
             case "vulners":
                     # Exécutez le scan Nmap et extrayez les informations du fichier XML
                 ports_info = parseNmapXmlCaseVulners(xml_file_path)
-
+                resultats = ResultatVulnersForm()
+                for result in ports_info:
+                    resultats = ResultatVulnersForm({
+                            'vulnerability': result.get('nameVuln', ''),
+                            'severity': result.get('cvss', ''),
+                            'type': result.get('type', ''),
+                            'is_exploit': result.get('is_exploit', False),
+                    })
+                if resultats.is_valid():
+                    resultats.save()
+                else:
+                    return HttpResponse("Resultat Vulners n'est pas valide")
             case "Simple Scan":
                 
                 ports_info = parseNmapXmlCaseTcpPing(xml_file_path)
+                resultats = ResultatTCPForm()
+                for result in ports_info:
+                    resultats = ResultatTCPForm({
+                            'port': result.get('port', ''),
+                            'etat': result.get('state', ''),
+                            'service': result.get('service', ''),
+                        })   
+                if resultats.is_valid():   
+                    resultats.save()
+                else:
+                    return HttpResponse("Resultat TCP n'est pas valide")
 
         return ports_info
