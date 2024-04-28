@@ -18,6 +18,9 @@ class LoginForm(forms.Form):
 class ScanForm(ModelForm):
   class Meta:
     model = Scan
+    start_time = forms.DateField(input_formats=['%Y-%m-%d'], required=True, error_messages={
+        'invalid': 'Please enter a valid date in the format YYYY-MM-DD.'
+    })
     fields = ('name','ip_address', 'scan_type','dataBase','start_time','recurrence',)
     
 class ResultatVulnersForm(ModelForm):

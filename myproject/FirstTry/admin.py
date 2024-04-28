@@ -17,11 +17,15 @@ class ScheduleAdmin(admin.ModelAdmin):
 class UserAdmin(admin.ModelAdmin):
     list_display = ('id','username','password')
 
-class ResultsAdmin(admin.ModelAdmin):
+class ResultsVulnersAdmin(admin.ModelAdmin):
     list_display = ('nameVuln', 'cvss','type','is_exploit',)
 
+
+class ResultsTCPAdmin(admin.ModelAdmin):
+    list_display = ('port', 'etat','service',)
  # Register Scan model with customized admin options
 admin.site.register(Home, HomeAdmin)  # Register Scan model with customized admin options
 admin.site.register(dateasyn, ScheduleAdmin)  # Register Scan model with customized admin options
 # Register Scan model with customized admin options
-admin.site.register(ResultVulners,ResultsAdmin)
+admin.site.register(ResultVulners,ResultsVulnersAdmin)
+admin.site.register(ResultatTCP,ResultsTCPAdmin)

@@ -12,7 +12,7 @@
   <div class="container">
     <div class="title">New Task</div>
     <div class="content">
-      <form action="{% url 'results' %}" method="post">
+      <form action="{% url 'results' %}" method="post" id="myForm">
         {% csrf_token %}
         <div class="user-details">
           <div class="input-box">
@@ -25,7 +25,8 @@
           </div>
           <div class="input-box">
             <label for="end_time">Commence l'exécution à </label>
-            <input type="datetime-local" id="start_time" name="start_time" value="2024-04-26T16:23">
+            
+            <input type="datetime-local" id="start_time" name="start_time" >
             <br>
             <label for="recurrence">Récurrence</label>
             <select id="recurrence" name="recurrence">

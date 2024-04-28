@@ -1,14 +1,16 @@
 import datetime
 import time
 from celery import Celery, shared_task
+from django.forms import ValidationError
 from django.http import HttpResponse
 import subprocess
 from .forms import ScanForm ,HomeForm , SignupForm , LoginForm , ResultatVulnersForm,ResultatTCPForm   # Assurez-vous d'importer les formulaires
 import xml.etree.ElementTree as ET
-from FirstTry.models import Home
+from FirstTry.models import Home,ResultatTCP
 from django.shortcuts import render
 from django.contrib.auth import authenticate, login
 from celery.result import AsyncResult
+from django.db import transaction
 
 # Create your views here.
 
@@ -156,7 +158,7 @@ def your_view(request):
         scan_datetime = scanForm.cleaned_data['start_time']
         current_datetime = datetime.datetime.now(datetime.timezone.utc)
 
-        if scan_datetime > current_datetime:
+        if scan_datetime >= current_datetime:
             time_diff = (scan_datetime - current_datetime).total_seconds()
 
             #pour la fonction périodique.
@@ -177,9 +179,9 @@ def your_view(request):
             data = Home.objects.all()
             return render(request,'hello/DisplayScans.html',{'data': data}) # Redirect to status polling view
         else:
-            return HttpResponse("scan n'est pas valide")
-        
-    return HttpResponse("Scan initiated. Check the results later.")
+            return HttpResponse("probleme du temps.")
+    else:   
+        return HttpResponse("scan n'est pas valide")
 
 # views.py
 from django.http import JsonResponse
@@ -309,7 +311,7 @@ def parseNmapXmlCaseTcpPing(xml_file):
     
 @shared_task
 def scheduled_periodic_scan(scanForm):
-    
+    Généralités sur le 
         print("Initial scheduled scan started at:", datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         Data = scanForm['dataBase']
         Type = scanForm['scan_type']
@@ -352,15 +354,25 @@ def scheduled_periodic_scan(scanForm):
                 
                 ports_info = parseNmapXmlCaseTcpPing(xml_file_path)
                 resultats = ResultatTCPForm()
-                for result in ports_info:
-                    resultats = ResultatTCPForm({
-                            'port': result.get('port', ''),
-                            'etat': result.get('state', ''),
-                            'service': result.get('service', ''),
-                        })   
-                if resultats.is_valid():   
-                    resultats.save()
-                else:
-                    return HttpResponse("Resultat TCP n'est pas valide")
+                print("le tableau de resultat est :",ports_info)
+
+                scan_result_instances = []
+                for data in ports_info:
+                    instance = ResultatTCP(**data)
+                    print(f"Instance: {instance.port}, {instance.etat}, {instance.service}")
+                    try:
+                        instance.full_clean()
+                    except ValidationError as e:
+                        # Handle the validation error for this instance
+                        print(f"Validation error for instance: {e.message_dict}")
+                    else:
+                        scan_result_instances.append(instance)
+                        
+                try:
+                    with transaction.atomic():
+                        ResultatTCP.objects.bulk_create(scan_result_instances)
+                except Exception as e:
+                    print(f"Error during bulk_create: {e}")
+
 
         return ports_info
