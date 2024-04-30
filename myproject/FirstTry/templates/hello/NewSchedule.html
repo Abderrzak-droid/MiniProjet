@@ -43,17 +43,6 @@
       </form>
     </div>
   </div>
-  {% if form.errors %}
-  <div style="color: red;">
-      <strong>Error{{ form.errors|pluralize }} occurred:</strong>
-      <ul>
-          {% for field, errors in form.errors.items %}
-              {% for error in errors %}
-                  <li>{{ field|title }}: {{ error }}</li>
-              {% endfor %}
-          {% endfor %}
-      </ul>
-  </div>
-{% endif %}
+
 </body>
 </html>

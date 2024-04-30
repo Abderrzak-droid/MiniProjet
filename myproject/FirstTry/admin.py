@@ -22,7 +22,7 @@ class ResultsVulnersAdmin(admin.ModelAdmin):
 
 
 class ResultsTCPAdmin(admin.ModelAdmin):
-    list_display = ('port', 'etat','service',)
+    list_display = ('port', 'state','service',)
  # Register Scan model with customized admin options
 admin.site.register(Home, HomeAdmin)  # Register Scan model with customized admin options
 admin.site.register(dateasyn, ScheduleAdmin)  # Register Scan model with customized admin options

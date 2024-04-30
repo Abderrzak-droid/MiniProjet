@@ -31,7 +31,7 @@ class ResultatVulnersForm(ModelForm):
 class ResultatTCPForm(ModelForm):
   class Meta:
     model = ResultatTCP
-    fields = ('port', 'etat','service')
+    fields = ('port', 'state','service',)
 
 class HomeForm(ModelForm):
   class Meta:

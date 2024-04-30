@@ -26,7 +26,7 @@ class Scan(models.Model):
 
 class ResultatTCP(models.Model):
     port = models.CharField(max_length=10)
-    etat= models.CharField(max_length=10)
+    state= models.CharField(max_length=10)
     service = models.CharField(max_length=20)
 
 class Home(models.Model):

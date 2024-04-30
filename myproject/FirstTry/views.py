@@ -103,6 +103,9 @@ def form(request):
     return render(request, "hello/NewTask.html", {'scan_form': scan_form})
     
 
+def ShowResultsTCP(request):
+    return render(request, "hello/TcpPingResults.html")
+
 
 def byScanType(request):
     scanForm = ScanForm(request.POST)
@@ -185,7 +188,9 @@ def your_view(request):
 
 # views.py
 from django.http import JsonResponse
+def AddSchedule(request):
 
+    return render(request , 'hello/NewSchedule.html')
 
 def check_task_result(request):
     # Get the task ID from the session or database
@@ -255,7 +260,7 @@ def parseNmapXmlCaseVulners(xml_file):
 
         return extracted_table 
     
-@shared_task
+
 def parseNmapXmlCaseTcpPing(xml_file):
     try:
         tree = ET.parse(xml_file)
@@ -311,7 +316,6 @@ def parseNmapXmlCaseTcpPing(xml_file):
     
 @shared_task
 def scheduled_periodic_scan(scanForm):
-    Généralités sur le 
         print("Initial scheduled scan started at:", datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         Data = scanForm['dataBase']
         Type = scanForm['scan_type']
@@ -336,7 +340,7 @@ def scheduled_periodic_scan(scanForm):
                 return HttpResponse(Data)
                         
             case "vulners":
-                    # Exécutez le scan Nmap et extrayez les informations du fichier XML
+                    
                 ports_info = parseNmapXmlCaseVulners(xml_file_path)
                 resultats = ResultatVulnersForm()
                 for result in ports_info:
@@ -346,33 +350,24 @@ def scheduled_periodic_scan(scanForm):
                             'type': result.get('type', ''),
                             'is_exploit': result.get('is_exploit', False),
                     })
-                if resultats.is_valid():
+                
                     resultats.save()
-                else:
-                    return HttpResponse("Resultat Vulners n'est pas valide")
+                
             case "Simple Scan":
                 
                 ports_info = parseNmapXmlCaseTcpPing(xml_file_path)
                 resultats = ResultatTCPForm()
-                print("le tableau de resultat est :",ports_info)
+                for result in ports_info:
+                    
+                    vulnerability = ResultatTCPForm({
+                        'port' : result['port'],
+                        'state' : result['state'],
+                        'service' : result['service'],
+                    }
+                    )
 
-                scan_result_instances = []
-                for data in ports_info:
-                    instance = ResultatTCP(**data)
-                    print(f"Instance: {instance.port}, {instance.etat}, {instance.service}")
-                    try:
-                        instance.full_clean()
-                    except ValidationError as e:
-                        # Handle the validation error for this instance
-                        print(f"Validation error for instance: {e.message_dict}")
-                    else:
-                        scan_result_instances.append(instance)
-                        
-                try:
-                    with transaction.atomic():
-                        ResultatTCP.objects.bulk_create(scan_result_instances)
-                except Exception as e:
-                    print(f"Error during bulk_create: {e}")
+                    vulnerability.save()
+
 
 
         return ports_info
