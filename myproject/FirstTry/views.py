@@ -1,17 +1,15 @@
 import datetime
 import time
 from celery import Celery, shared_task
-from django.forms import ValidationError
 from django.http import HttpResponse
 import subprocess
-from .forms import ScanForm ,HomeForm , SignupForm , LoginForm , ResultatVulnersForm,ResultatTCPForm   # Assurez-vous d'importer les formulaires
+from .forms import TaskForm ,HomeForm , SignupForm , LoginForm , ResultatVulnersForm,ResultatTCPForm   # Assurez-vous d'importer les formulaires
 import xml.etree.ElementTree as ET
-from FirstTry.models import Home,ResultatTCP
+from FirstTry.models import Home,ResultatTCP, ScanPorts, ScanVulnerabilities,Schedule,Target
 from django.shortcuts import render
 from django.contrib.auth import authenticate, login
 from celery.result import AsyncResult
-from django.db import transaction
-
+from django.contrib.contenttypes.models import ContentType
 # Create your views here.
 
 
@@ -65,14 +63,17 @@ def indexwithout(request):
     return render(request,"hello/Home.html")
 
 def AddTask(request):
-    return render(request,"hello/NewTask.html")
+    schedule = Schedule.objects.all()
+    targets = Target.objects.all()
+    context = {'choices': schedule ,'targets':targets}
+    return render(request,"hello/NewTask.html",context)
 
 @shared_task
-def runCommand(scanForm) :
+def runCommand(taskForm) :
     
-    Type = scanForm['scan_type']
-    db = scanForm["dataBase"]
-    IpAddress = scanForm["ip_address"]
+    Type = taskForm['scan_type']
+    db = taskForm["dataBase"]
+    IpAddress = taskForm["ip_address"]
     if db == "Simple Scan":
         command = "nmap -oX output.xml "+ Type +" "+ IpAddress
     else:
@@ -90,7 +91,7 @@ def viewhtml (request) :
 #hadi hia akher 7adja ********************************************
 def form(request):
     if request.method == 'POST':
-        scan_form = ScanForm(request.POST)
+        scan_form = TaskForm(request.POST)
      
         if scan_form.is_valid():
             # Sauvegarder les données du formulaire
@@ -98,7 +99,7 @@ def form(request):
             your_view(request)
 
     else:
-        scan_form = ScanForm()
+        scan_form = TaskForm()
    
     return render(request, "hello/NewTask.html", {'scan_form': scan_form})
     
@@ -108,12 +109,12 @@ def ShowResultsTCP(request):
 
 
 def byScanType(request):
-    scanForm = ScanForm(request.POST)
-    runCommand(scanForm)
+    taskForm = TaskForm(request.POST)
+    runCommand(taskForm)
     # Chemin vers le fichier XML généré par Nmap
     xml_file_path = 'output.xml'
     
-    if scanForm['scan_type'].value() == "-sT":
+    if taskForm['scan_type'].value() == "-sT":
         # Exécutez le scan Nmap et extrayez les informations du fichier XML
         ports_info = parseNmapXmlCaseTcpPing(xml_file_path)
         # Passez les informations extraites au template
@@ -123,22 +124,37 @@ def byScanType(request):
 
 def your_view(request):
 
-    scanForm = ScanForm(request.POST)
+    taskForm = TaskForm(request.POST)
     
-    if scanForm.is_valid():
+    if taskForm.is_valid():
+        task = form.save(commit=False)
+        task.target = taskForm.cleaned_data['target']
+        task.Configuration = taskForm.cleaned_data['Configuration']
+        task.schedule = taskForm.cleaned_data['schedule']
+        content_type = taskForm.cleaned_data['content_type']
+        scan_id = form.cleaned_data['object_id']
 
-        # Sauvegarder les données du formulaire
-        homeForm = HomeForm({
-                'name_scan': scanForm['name'].value(),
-                'status': "Done",
-                'ip_address_scan':scanForm['ip_address'].value(),
-        }   
-        )
-        homeForm.save()
+        if content_type == ContentType.objects.get_for_model(ScanPorts):
+            related_object = ScanPorts.objects.get(pk=scan_id)
+        elif content_type == ContentType.objects.get_for_model(ScanVulnerabilities):
+            related_object = ScanVulnerabilities.objects.get(pk=scan_id)
+        
+        task.content_object = related_object
+
+        task.save()
+
+        # # Sauvegarder les données du formulaire
+        # homeForm = HomeForm({
+        #         'name_scan': taskForm['name'].value(),
+        #         'status': "Done",
+        #         'ip_address_scan':taskForm['ip_address'].value(),
+        # }   
+        # )
+        # homeForm.save()
         
         d=0
         
-        duration = scanForm['recurrence'].value()
+        duration = taskForm['recurrence'].value()
         if duration == "daily":
             d = 1
         elif duration == "weekly":
@@ -150,15 +166,15 @@ def your_view(request):
         elif duration == "none":
             d=0
 
-        scanForm_serializable = {
-            'ip_address':scanForm['ip_address'].value(),
-            'name': scanForm['name'].value(),
-            'scan_type': scanForm['scan_type'].value(),
-            'dataBase':scanForm['dataBase'].value(),
-            'start_time': scanForm['start_time'].value(),
-            'recurrence' : scanForm['recurrence'].value(),
+        taskForm_serializable = {
+            'ip_address':taskForm['ip_address'].value(),
+            'name': taskForm['name'].value(),
+            'scan_type': taskForm['scan_type'].value(),
+            'dataBase':taskForm['dataBase'].value(),
+            'start_time': taskForm['start_time'].value(),
+            'recurrence' : taskForm['recurrence'].value(),
         }
-        scan_datetime = scanForm.cleaned_data['start_time']
+        scan_datetime = taskForm.cleaned_data['start_time']
         current_datetime = datetime.datetime.now(datetime.timezone.utc)
 
         if scan_datetime >= current_datetime:
@@ -171,12 +187,12 @@ def your_view(request):
             print("Waiting for initial scheduled scan at:", scan_datetime.strftime("%Y-%m-%d %H:%M:%S"))
             print("Time left:", datetime.timedelta(seconds=time_diff))
 
-            target=scanForm['ip_address'].value()
+            target=taskForm['ip_address'].value()
 
             print("target is : ",target)
             print("current:", current_datetime.strftime("%Y-%m-%d %H:%M:%S"))
 
-            ports_info_result = scheduled_periodic_scan.apply_async(args=(scanForm_serializable,), countdown=time_diff)
+            ports_info_result = scheduled_periodic_scan.apply_async(args=(taskForm_serializable,), countdown=time_diff)
 
 
             data = Home.objects.all()
@@ -294,7 +310,7 @@ def parseNmapXmlCaseTcpPing(xml_file):
         return []   
        
 
-    # runCommand(scanForm)
+    # runCommand(taskForm)
     # match Data:
     
     #     case "vuln":
@@ -315,12 +331,12 @@ def parseNmapXmlCaseTcpPing(xml_file):
 
     
 @shared_task
-def scheduled_periodic_scan(scanForm):
+def scheduled_periodic_scan(taskForm):
         print("Initial scheduled scan started at:", datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-        Data = scanForm['dataBase']
-        Type = scanForm['scan_type']
-        db = scanForm["dataBase"]
-        IpAddress = scanForm["ip_address"]
+        Data = taskForm['dataBase']
+        Type = taskForm['scan_type']
+        db = taskForm["dataBase"]
+        IpAddress = taskForm["ip_address"]
         if db == "Simple Scan":
             command = "nmap -oX output.xml "+ Type +" "+ IpAddress
         else:

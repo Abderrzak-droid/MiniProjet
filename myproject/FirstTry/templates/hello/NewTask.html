@@ -16,27 +16,28 @@
         {% csrf_token %}
         <div class="user-details">
           <div class="input-box">
-            <span class="details">Name Of Scan</span>
+            <span class="details">Name Of Task</span>
             <input type="text" name="name"   placeholder="Enter your name" required>
           </div>
           <div class="input-box">
             <span class="details">Scan Target(s)</span>
-            <input type="text" name="ip_address" maxlength="15" placeholder="IP Address" required="" id="id_ip_address">
+            <select>
+              {% for choice in targets %}
+              <option value="{{ choice.Target_Name }}">
+                  {{ choice.Target_Name }} 
+              </option>
+              {% endfor %}
+          </select>
           </div>
           <div class="input-box">
-            <label for="end_time">Commence l'exécution à </label>
-            
-            <input type="datetime-local" id="start_time" name="start_time" >
-            <br>
-            <label for="recurrence">Récurrence</label>
-            <select id="recurrence" name="recurrence">
-            <option value="monthly">Mensuelle</option>
-            <option value="daily">Quotidienne</option>
-            <option value="weekly">Hebdomadaire</option>
-            <option value="yearly">Annuelle</option>
-            <option value="none">Une seule fois</option>
-            </select>
-            <br>
+            <span class="details">Schedule</span>
+            <select>
+              {% for choice in choices %}
+              <option value="{{ choice.Schedule_Name }}">
+                  {{ choice.Schedule_Name }} 
+              </option>
+              {% endfor %}
+          </select>
           </div>
           <div class="input-box">
             <span class="details">Scan Type</span>

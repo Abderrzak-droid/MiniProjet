@@ -1,7 +1,7 @@
 from django.forms import ModelForm
 from . import models
-from .models import Scan , dateasyn
-from .models import ResultVulners,Home,ResultatTCP
+from .models import Scan ,Task
+from .models import ResultVulners,Home,ResultatTCP,Schedule,Target
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
@@ -15,14 +15,25 @@ class LoginForm(forms.Form):
     username = forms.CharField()
     password = forms.CharField(widget=forms.PasswordInput)
 
-class ScanForm(ModelForm):
+
+class ScheduleForm(ModelForm):
   class Meta:
-    model = Scan
+    model = Schedule
+    fields = ('Schedule_Name', 'recurrence', 'start_time',)
+
+class TaskForm(ModelForm):
+  class Meta:
+    model = Task
     start_time = forms.DateField(input_formats=['%Y-%m-%d'], required=True, error_messages={
         'invalid': 'Please enter a valid date in the format YYYY-MM-DD.'
     })
-    fields = ('name','ip_address', 'scan_type','dataBase','start_time','recurrence',)
-    
+    fields = ('name','target', 'schedule','Configuration','Creation_Time',)
+
+class ScanForm(ModelForm):
+  class Meta:
+    model = Scan
+    fields = ('Scan_Name','scan_type','content_type',)
+
 class ResultatVulnersForm(ModelForm):
   class Meta:
     model = ResultVulners
@@ -38,7 +49,7 @@ class HomeForm(ModelForm):
     model = Home
     fields = ('name_scan','ip_address_scan','status')
 
-class dateasynForm(ModelForm) :
+class TargetForm(ModelForm):
   class Meta:
-    model = dateasyn  
-    fields = ('ip_address','scan_type','start_time', 'end_time','duration','recurrence',)  
+    model = Target
+    fields = ('Target_Name','Address_IP',)
