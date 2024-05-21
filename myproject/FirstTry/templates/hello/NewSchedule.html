@@ -12,12 +12,12 @@
   <div class="container">
     <div class="title">New Schedule</div>
     <div class="content">
-      <form action="{% url 'results' %}" method="post">
+      <form id="myForm" action="{% url 'NewSchedule' %}" method="post">
         {% csrf_token %}
         <div class="user-details">
           <div class="input-box">
             <span class="details">Name Of Schedule</span>
-            <input type="text" name="name_scan"   placeholder="Enter your name" required>
+            <input type="text" name="Schedule_Name"   placeholder="Enter Schedule's name" required>
           </div>
           <div class="input-box">
             <span class="details">Reccurence :</span>
@@ -31,16 +31,52 @@
             </select>
           </div>
           <div class="input-box">
-            <span class="details">Start :</span>
-            <input type="datetime-local" id="start_time" name="start_time" value="2024-04-20T19:48">
+            <span class="details">Start at </span>
+            <input type="datetime-local" id="start_time" name="start_time" >
+            <button type="button" id="nowButton">Now</button>
           </div>
-        
+                <!-- Hidden input to store the current time -->
+                <input type="hidden" id="currentTime" name="currentTime">
         </div>  
 
         <div class="button">
           <input type="submit" value="Register">
         </div>
       </form>
+
+
+    <script>
+        document.getElementById('nowButton').addEventListener('click', function() {
+            var now = new Date();
+            var datetimeInput = document.getElementById('start_time');
+
+            // Format the date and time to YYYY-MM-DDTHH:MM
+            var day = String(now.getDate()).padStart(2, '0');
+            var month = String(now.getMonth() + 1).padStart(2, '0'); // January is 0!
+            var year = now.getFullYear();
+            var hours = String(now.getHours()).padStart(2, '0');
+            var minutes = String(now.getMinutes()).padStart(2, '0');
+
+            var formattedDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
+            datetimeInput.value = formattedDateTime;
+
+            // Submit the form
+            document.getElementById('myForm').submit();
+        });
+
+        document.getElementById('myForm').addEventListener('submit', function(event) {
+            var datetimeInput = document.getElementById('datetime');
+            var currentTimeInput = document.getElementById('currentTime');
+
+            // Use the value of the datetime-local input
+            var selectedDateTime = datetimeInput.value;
+
+            // If the "Now" button was clicked, current time is already set
+            if (selectedDateTime) {
+                currentTimeInput.value = new Date().toISOString();
+            }
+        });
+  </script>
     </div>
   </div>
 

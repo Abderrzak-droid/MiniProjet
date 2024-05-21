@@ -1,0 +1,38 @@
+{% load static %}
+<!DOCTYPE html>
+
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8">
+    <title> Adding New Target | Brahim/Hamza </title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   </head>
+<body>
+  <div class="container">
+    <div class="title">New Target</div>
+    <div class="content">
+      <form action="{% url 'NewTarget' %}" method="post">
+        {% csrf_token %}
+        <div class="user-details">
+          <div class="input-box">
+            <span class="details">Name Of Target</span>
+            <input type="text" name="Target_Name"   placeholder="Enter Target's name" required>
+          </div>
+
+          <div class="input-box">
+            <span class="details"> Target's Address(s)</span>
+            <input type="text" name="Address_IP" maxlength="15" placeholder="IP Address" required="" id="id_ip_address">
+          </div>
+        
+        </div>  
+
+        <div class="button">
+          <input type="submit" value="Register">
+        </div>
+      </form>
+    </div>
+  </div>
+
+</body>
+</html>

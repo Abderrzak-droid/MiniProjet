@@ -28,6 +28,8 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
+NVD_API_KEY = 'c42f7636-d19c-4e73-b60b-a222e8678055'
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -119,15 +121,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-    os.path.join(BASE_DIR, 'static/css'),
-    os.path.join(BASE_DIR, 'static/fonts'),
-    os.path.join(BASE_DIR, 'static/images'),
-    os.path.join(BASE_DIR, 'static/js'),
-    os.path.join(BASE_DIR, 'static/scss'),
-    os.path.join(BASE_DIR, 'static/vendor'),
-    ]
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 

@@ -27,7 +27,10 @@
                             <th>#</th>
                             <th>Name</th>
                             <th>Status</th>
-                            <th>IP Address</th>
+                            <th>Scan's configuration</th>
+                            <th>Schedule</th>
+                            <th>Target's IP Address</th>
+                            <th>Creation time</th>
                             <th>&nbsp;</th>
                         </tr>
                         </thead>
@@ -36,19 +39,20 @@
                         <tr data-toggle="collapse" data-target="#collapse{{ scan.id }}" aria-expanded="false"
                             aria-controls="collapse{{ scan.id }}">
                             <th scope="row">{{ scan.id }}</th>
-                            <td>{{ scan.name_scan }}</td>
+                            <td>{{ scan.name }}</td>
                             <td>{{ scan.status }}</td>
-                            <td>{{ scan.ip_address_scan }}</td>
+                            <td>{{ scan.Configuration }}</td>
+                            <td>{{ scan.schedule }}</td>
+                            <td>{{ scan.target }}</td>
+                            <td>{{ scan.Creation_Time }}</td>
                             <td>
                                 <i class="fa fa-chevron-down" aria-hidden="true"></i>
                             </td>
                         </tr>
                         <tr id="collapse{{ scan.id }}" class="collapse acc" data-parent="#accordion">
-                            <td colspan="5">
+                            <td colspan="8">
                                 <p>
-                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Porro iste, facere sunt
-                                    sequi nostrum ipsa, amet doloremque magnam reiciendis tempore sapiente.
-                                    Necessitatibus recusandae harum nam sit perferendis quia inventore natus.
+                                    hellloo
                                 </p>
                             </td>
                         </tr>

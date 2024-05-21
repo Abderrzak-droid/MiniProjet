@@ -16,45 +16,46 @@
         {% csrf_token %}
         <div class="user-details">
           <div class="input-box">
-            <span class="details">Name Of Scan</span>
+            <span class="details">Name Of Task</span>
             <input type="text" name="name"   placeholder="Enter your name" required>
           </div>
           <div class="input-box">
-            <span class="details">Scan Target(s)</span>
-            <input type="text" name="ip_address" maxlength="15" placeholder="IP Address" required="" id="id_ip_address">
-          </div>
-          <div class="input-box">
-            <label for="end_time">Commence l'exécution à </label>
+            <span class="input-title" >Scan Target(s)</span> <span> <a href="{%url 'NewTarget' %}">New Target</a></span>
             
-            <input type="datetime-local" id="start_time" name="start_time" >
-            <br>
-            <label for="recurrence">Récurrence</label>
-            <select id="recurrence" name="recurrence">
-            <option value="monthly">Mensuelle</option>
-            <option value="daily">Quotidienne</option>
-            <option value="weekly">Hebdomadaire</option>
-            <option value="yearly">Annuelle</option>
-            <option value="none">Une seule fois</option>
+            <select name="target" id="id_target" required>
+              {% for choice in targets %}
+              <option value="{{ choice.id }}">
+                  {{ choice.Target_Name }} 
+              </option>
+              {% endfor %}
             </select>
-            <br>
           </div>
+        </div>
+        <div class="user-details">
+        <div class="input-box">
+          <span class="input-title">Schedule</span>  <a href="{%url 'NewSchedule' %}"> New Schedule</a>
+          
+          <select name="schedule" id="id_schedule" required>
+            <option value="Now">Now</option>
+            {% for choice in choices %}
+            <option value="{{ choice.id }}">
+                {{ choice.Schedule_Name }} 
+            </option>
+            {% endfor %}
+        </select>
+       
+      </div>
+      
           <div class="input-box">
-            <span class="details">Scan Type</span>
-            <select name="scan_type" id="id_scan_type">
-                <option value="-sT">Tcp ping</option>
-                <option value="-O">OS detection</option>
-               <option>Log4Shell</option>
-              </select>
-          </div>
-        
-          <div class="input-box">
-            <span class="details">Data Base</span>
-            <select name="dataBase" id="id_dataBase">
-              <option value="Simple Scan">Simple Scan</option>
-                <option value="vuln">Vuln</option>
-                <option value="vulners">Vulners</option>
-                <option value="vulnscan">VulnScan</option>
-              </select>
+            <span class="details">Scan Configuration</span>
+          
+            <select name="Configuration" id="id_Configuration">
+              {% for choice in scans %}
+              <option value="{{ choice.id }}">
+                  {{ choice.Scan_Name }} 
+              </option>
+              {% endfor %}
+          </select>
           </div>
         </div>  
         <div class="button">
@@ -64,5 +65,17 @@
     </div>
   </div>
 
+  {% if form.errors %}
+  <div>
+      <h2>Form Errors:</h2>
+      <ul>
+          {% for field, errors in form.errors.items %}
+              {% for error in errors %}
+                  <li>{{ field }}: {{ error }}</li>
+              {% endfor %}
+          {% endfor %}
+      </ul>
+  </div>
+{% endif %}
 </body>
 </html>

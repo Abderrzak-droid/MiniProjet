@@ -1,0 +1,132 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+  	<title>Dashboard EMP VAS</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900" rel="stylesheet">
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+		<link rel="stylesheet" href="{% static 'css/dashboard/style.css' %}">
+  </head>
+  <body >
+		
+		<div class="wrapper d-flex align-items-stretch">
+			<nav id="sidebar">
+				<div class="custom-menu">
+					<button type="button" id="sidebarCollapse" class="btn btn-primary">
+	          <i class="fa fa-bars"></i>
+	          <span class="sr-only">Toggle Menu</span>
+	        </button>
+        </div>
+				<div class="p-4">
+		  		<h1><a href="index.html" class="logo">EMP VAS <span>Dashboard</span></a></h1>
+	        <ul class="list-unstyled components mb-5">
+	          <li class="active">
+	            <a href="#"><span class="fa fa-home mr-3"></span> Home</a>
+	          </li>
+	          <li>
+	              <a href="{% url 'results' %}"><span class="fa fa-user mr-3"></span> Scan</a>
+	          </li>
+	          <li>
+              <a href="#"><span class="fa fa-briefcase mr-3"></span> Target</a>
+	          </li>
+	          <li>
+              <a href="#"><span class="fa fa-sticky-note mr-3"></span> Schedule</a>
+	          </li>
+
+	          <li>
+              <a href="{% url 'VulnResults' %}"><span class="fa fa-cogs mr-3"></span> Results</a>
+	          </li>
+	          <li>
+              <a href="#"><span class="fa fa-paper-plane mr-3"></span> Contacts</a>
+	          </li>
+	        </ul>
+
+
+	      </div>
+    	</nav>
+
+        <!-- Page Content  -->
+      <div id="content" class="p-4 p-md-5 pt-5">
+          <h1> Results  </h1>
+         <br>
+
+       </header>
+       <!--$%adsense%$-->
+       <div class="table-wrap">
+        <a href="{% url 'NewTask' %}">New Task</a>
+        <table class="table myaccordion table-hover" id="accordion">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Scan's configuration</th>
+                <th>Schedule</th>
+                <th>Target's IP Address</th>
+                <th>Creation time</th>
+                <th>&nbsp;</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for scan in data %}
+            <tr data-toggle="collapse" data-target="#collapse{{ scan.id }}" aria-expanded="false"
+                aria-controls="collapse{{ scan.id }}">
+                <th scope="row">{{ scan.id }}</th>
+                <td>{{ scan.name }}</td>
+                <td>{{ scan.status }}</td>
+                <td>{{ scan.Configuration }}</td>
+                <td>{{ scan.schedule }}</td>
+                <td>{{ scan.target }}</td>
+                <td>{{ scan.Creation_Time }}</td>
+                <td>
+                    <i class="fa fa-chevron-down" aria-hidden="true"></i>
+                </td>
+            </tr>
+            <tr id="collapse{{ scan.id }}" class="collapse acc" data-parent="#accordion">
+                <td colspan="8">
+                    <h2>Details :</h2>
+
+                      <h4>Name : </h3>
+
+                        <h6> {{ scan.name }}</h6>
+
+                      <h4>Target's Address :</h4>
+
+                      <h6> {{ scan.target }}</h6>
+
+                      <h4>Detection Method :</h4>
+
+                      <h6>Nmap NSE (based on vulners)</h6>
+
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>
+</div>
+</section>
+
+<script>
+// Change icon on collapse/expand
+$('.myaccordion').on('hide.bs.collapse', function (e) {
+$(e.target).prev('tr').find('i').removeClass('fa-chevron-up').addClass('fa-chevron-down');
+});
+
+$('.myaccordion').on('show.bs.collapse', function (e) {
+$(e.target).prev('tr').find('i').removeClass('fa-chevron-down').addClass('fa-chevron-up');
+});
+</script>
+		</div>
+
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script src="{% static 'js/popper.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+  </body>
+</html>

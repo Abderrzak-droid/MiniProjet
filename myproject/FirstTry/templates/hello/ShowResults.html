@@ -36,16 +36,17 @@
                     <th>sevérité</th>
                     <th>Type de vuln</th>
                     <th>Is Exploitable</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
                 {% for port_info in ports_info %}
                 <tr>
-                    <td>{{ port_info.id }}</td>
-                    <td>{{ port_info.cvss }}</td>
+                    <td>{{ port_info.vulnerability }}</td>
+                    <td>{{ port_info.severity }}</td>
                     <td>{{ port_info.type }}</td>
                     <td>{{ port_info.is_exploit }}</td>
-                    
+                    <td><button class="toggle-details" data-details="{{ port_info.description }}">Toggle Details</button></td>
                 </tr>
                 {% endfor %}
             </tbody>
