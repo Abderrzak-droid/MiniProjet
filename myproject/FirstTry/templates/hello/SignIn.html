@@ -26,13 +26,41 @@
 <!--===============================================================================================-->
 	<link rel="stylesheet" type="text/css" href="{% static 'css/util.css' %}">
 	<link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}">
+	<style>
+		@import url("https://fonts.googleapis.com/css2?family=Russo+One&display=swap");
+
+svg {
+	font-family: "Russo One", sans-serif;
+	width: 500px; height: 100%;
+}
+svg text {
+	animation: stroke 6s infinite alternate;
+	stroke-width: 2;
+	stroke: #A00C47;
+	font-size: 100px;
+}
+@keyframes stroke {
+	0%   {
+		fill: rgba(72,138,204,0); stroke: rgba(160,12,71,1);
+		stroke-dashoffset: 25%; stroke-dasharray: 0 50%; stroke-width: 2;
+	}
+	70%  {fill: rgba(72,138,204,0); stroke: rgba(160,12,71,1); }
+	80%  {fill: rgba(72,138,204,0); stroke: rgba(160,12,71,1); stroke-width: 3; }
+	100% {
+		fill: rgba(72,138,204,1); stroke: rgba(160,12,71,0);
+		stroke-dashoffset: -25%; stroke-dasharray: 50% 0; stroke-width: 0;
+	}
+}
+
+
+	</style>
 <!--===============================================================================================-->
 </head>
-<body>
-	
+<body >
+
 	<div class="limiter">
 		<div class="container-login100" style="background-image: url('images/bg-01.jpg');">
-			<div class="wrap-login100 p-l-55 p-r-55 p-t-65 p-b-54">
+			<div class="wrap-login100 p-l-55 p-r-55 p-t-65 p-b-54" >
 				<form class="login100-form validate-form" method="post" action="{% url 'signup' %}">
 					{% csrf_token %}
 					<span class="login100-form-title p-b-49">
@@ -69,24 +97,20 @@
 					<div class="txt1 text-center p-t-54 p-b-20">
 						<a href="{% url 'login' %}">Login in if you have an account</a>
 					</div>
-
-					<div class="flex-c-m">
-						<a href="#" class="login100-social-item bg1">
-							<i class="fa fa-facebook"></i>
-						</a>
-
-						<a href="#" class="login100-social-item bg2">
-							<i class="fa fa-twitter"></i>
-						</a>
-
-						<a href="#" class="login100-social-item bg3">
-							<i class="fa fa-google"></i>
-						</a>
+					<div class="wrapper">
+						<svg>
+							<text x="44%" y="50%" dy=".35em" text-anchor="middle">
+								EMP VAS
+							</text>
+						</svg>
 					</div>
-					
-				</form>
+
+				</form>	
+
 			</div>
+
 		</div>
+
 	</div>
 	
 
@@ -109,5 +133,6 @@
 <!--===============================================================================================-->
 	<script src="{% static 'js/main2.js' %}"></script>
 
+	<script src="{% static 'js/time.js' %}"></script>
 </body>
 </html>

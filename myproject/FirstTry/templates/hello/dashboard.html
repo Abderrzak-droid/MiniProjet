@@ -24,7 +24,7 @@
 		  		<h1><a href="index.html" class="logo">EMP VAS <span>Dashboard</span></a></h1>
 	        <ul class="list-unstyled components mb-5">
 	          <li class="active">
-	            <a href="#"><span class="fa fa-home mr-3"></span> Home</a>
+	            <a href="{%url 'index' %}"><span class="fa fa-home mr-3"></span> Home</a>
 	          </li>
 	          <li>
 	              <a href="{% url 'results' %}"><span class="fa fa-user mr-3"></span> Scan</a>
@@ -77,6 +77,7 @@
                 <th scope="row">{{ scan.id }}</th>
                 <td>{{ scan.name }}</td>
                 <td>{{ scan.status }}</td>
+        
                 <td>{{ scan.Configuration }}</td>
                 <td>{{ scan.schedule }}</td>
                 <td>{{ scan.target }}</td>
@@ -126,7 +127,7 @@ $(e.target).prev('tr').find('i').removeClass('fa-chevron-down').addClass('fa-che
 
     <script src="{% static 'js/jquery.min.js' %}"></script>
     <script src="{% static 'js/popper.js' %}"></script>
-    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/table/bootstrap.min.js' %}"></script>
     <script src="{% static 'js/main.js' %}"></script>
   </body>
 </html>

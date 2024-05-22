@@ -9,7 +9,7 @@ class ResultVulners(models.Model):
     type =  models.CharField(max_length=50)
     is_exploit  =  models.BooleanField()
     vulnerability =  models.CharField(max_length=50, unique=True)
-    description = models.CharField(max_length=254)
+    description = models.TextField()
 
 class Target(models.Model):
     Target_Name = models.CharField(max_length=30)

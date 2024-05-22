@@ -15,6 +15,8 @@ urlpatterns =[
     path("VulnResults", views.ShowResults , name = 'VulnResults'),
     path("NewSchedule", views.AddSchedule , name ='NewSchedule'),
     path("NewTarget", views.AddTarget , name ='NewTarget'),
-    path('create-task/', views.create_task, name='create_task')
+    path('create-task/', views.create_task, name='create_task'),
+    path('Scans', views.ShowScans, name='ShowScans'),
+
    
 ]

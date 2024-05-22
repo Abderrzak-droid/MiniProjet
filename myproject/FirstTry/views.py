@@ -358,32 +358,43 @@ def check_task_result(request):
     return JsonResponse(notification)
 
 def get_vulnerability_details(cve_id):
-    # NVD API endpoint for retrieving CVE details
-    url = f"https://services.nvd.nist.gov/rest/json/cve/2.0/{cve_id}"
+    try:
+        # NVD API endpoint for retrieving CVE details
+        url = f"https://services.nvd.nist.gov/rest/json/cves/2.0?cveId={cve_id}"
+        timeout = 30 
 
-    headers = {
-        'apiKey': settings.NVD_API_KEY,
-    }
-    params = {
-        'keyword': 'django',
-    }
+        headers = {'API-Key': settings.NVD_API_KEY}
+        # Send the API request
+        response = requests.get(url, headers=headers, timeout=timeout) 
+        # Check if the request was successful
+        response.raise_for_status() 
+            # Parse the JSON response
 
-    response = requests.get(url)
-    
-        # Parse the JSON response
-    vulnerability_details = response.json()
+        vulnerability_details = response.json()
 
-        # Extract and return relevant information
-    vulnerability_data = vulnerability_details["vulnerabilities"][0]["cve"]
+            # Extract and return relevant information
+        vulnerability_data = vulnerability_details["vulnerabilities"][0]["cve"]
 
-    description = vulnerability_data["descriptions"][0]["value"]
+        description = vulnerability_data["descriptions"][0]["value"]  # English description
+            
+        if description is not None:
+            return description
+        else:
+            return "Echoué"
 
-    return description
-
+    except requests.exceptions.RequestException as e:
+        print(f"Error: {e}")
+    except ValueError as e:
+        print(f"Error: Invalid JSON response from the API: {e}")
+    except (KeyError, IndexError) as e:
+        print(f"Error: Unexpected JSON structure. {e}")
 def ShowResults(request):
     Results = ResultVulners.objects.all()
 
     return render(request , "hello/ShowResults.html",{'ports_info':Results})
+
+def check_cve_prefix(cve_id):
+    return cve_id.startswith("CVE")
 
 def parseNmapXmlCaseVulners(xml_file):
 
@@ -392,7 +403,7 @@ def parseNmapXmlCaseVulners(xml_file):
         root = tree.getroot()
 
         extracted_table = []
-        
+        id = " "
         for table in root.findall('.//table'):
             
             for elem in table.findall('.//elem'):
@@ -407,15 +418,20 @@ def parseNmapXmlCaseVulners(xml_file):
                         id = value
                     case 'type':
                         Type = value
-
-            details = get_vulnerability_details(id)
-            if details is None:
-                details = " Pas de description "
+            print("cve is : ",id)
+            if check_cve_prefix(id): 
+                print("entered the cve part")
+                details = get_vulnerability_details(id)
+                if details is None:
+                    details = " Pas de description "
+                print("description de vulnerability ",id ," :" ,details)
+            else : 
+                details = "N'est pas identifiant de CVE"
             extracted_table.append({'nameVuln': id,
                          'cvss': cvss,
                           'type':Type,
                           'is_exploit':isExploitable,
-                          'description': details,
+                          'details': details,
                           })
 
         
@@ -505,7 +521,7 @@ def scheduled_periodic_scan(scanForm):
                             'severity': result.get('cvss', 0.0),
                             'type': result.get('type', 'N/A'),
                             'is_exploit': result.get('is_exploit', False),
-                            'description': result.get('description', 'Pas de description')
+                            'description': result.get('details', "Pas de description"),
                     })
                     if not resultats.is_valid():
                         print(resultats.errors)  # This will print a dictionary of errors
@@ -535,3 +551,9 @@ def scheduled_periodic_scan(scanForm):
 
 
         return ports_info
+
+
+def ShowScans(request):
+    Scans = Scan.objects.all()
+
+    return render(request, "Hello/ShowScans.html", {'scans' : Scans})

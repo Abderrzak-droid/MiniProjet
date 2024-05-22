@@ -6,14 +6,14 @@ from django.contrib import admin
 from .models import Task,Schedule,Scan,Home, Target,User, ResultVulners,ResultatTCP
 
 class HomeAdmin(admin.ModelAdmin):
-    list_display = ('id','name','target', 'schedule','Configuration','Creation_Time',)
+    list_display = ('id','name','target', 'schedule','Configuration','Creation_Time')
 
 
 class UserAdmin(admin.ModelAdmin):
     list_display = ('id','username','password')
 
 class ResultsVulnersAdmin(admin.ModelAdmin):
-    list_display = ('id','vulnerability', 'severity','type','is_exploit',)
+    list_display = ('id','vulnerability', 'severity','type','is_exploit','description',)
 
 class ScheduleAdmin(admin.ModelAdmin):
     list_display = ('id','Schedule_Name','recurrence','start_time')
