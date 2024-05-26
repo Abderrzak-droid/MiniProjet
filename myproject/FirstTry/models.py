@@ -10,6 +10,21 @@ class ResultVulners(models.Model):
     is_exploit  =  models.BooleanField()
     vulnerability =  models.CharField(max_length=50, unique=True)
     description = models.TextField()
+    
+    def __str__(self):
+        return self.vulnerability
+
+class NmapScriptType(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    description = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "Nmap Script Type"
+        verbose_name_plural = "Nmap Script Types"
+
 
 class Target(models.Model):
     Target_Name = models.CharField(max_length=30)
@@ -45,10 +60,40 @@ class ResultatTCP(models.Model):
 class Scan(models.Model):
     id = models.AutoField(primary_key=True)
     Scan_Name = models.CharField(max_length=20)
-    scan_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    # GenericForeignKey allows the scan_type field to reference any object
-    object_id = models.PositiveIntegerField()
-    content_object = GenericForeignKey('scan_type', 'object_id')
+    scan_type = models.ForeignKey(NmapScriptType, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.Scan_Name
+
+    class Meta:
+        verbose_name = "Scan Configuration"
+        verbose_name_plural = "Scan Configurations"
+
+
+class CustomScriptType(models.Model):
+    id = models.AutoField(primary_key=True)
+    Script_Name = models.CharField(max_length=20)
+    script_types = models.ManyToManyField(NmapScriptType)
+
+    def __str__(self):
+        return self.Script_Name
+    
+    def script_types_list(self):
+        return ', '.join([st.name for st in self.script_types.all()])
+
+    script_types_list.short_description = 'script_types'
+
+
+class Resultats(models.Model):
+    severity =  models.FloatField()    
+    is_exploit  =  models.BooleanField()
+    vulnerability =  models.CharField(max_length=50, unique=True)
+    Task = models.CharField(max_length=30)
+    Host_IP = models.CharField(max_length=30)
+    Host_Name = models.CharField(max_length=20)
+    description = models.TextField()
+
+
 
 class Home(models.Model):
     id = models.AutoField( primary_key=True)  # Adjust the max_length as per your requirements
@@ -69,3 +114,4 @@ class Task(models.Model):
     target = models.ForeignKey(Target, on_delete=models.CASCADE)
     Configuration = models.ForeignKey(Scan, on_delete=models.CASCADE)
     schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE)
+

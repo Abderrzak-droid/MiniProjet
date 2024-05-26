@@ -27,7 +27,7 @@
 	            <a href="{%url 'index' %}"><span class="fa fa-home mr-3"></span> Home</a>
 	          </li>
 	          <li>
-	              <a href="{% url 'results' %}"><span class="fa fa-user mr-3"></span> Scan</a>
+	              <a href="{% url 'Scans' %}"><span class="fa fa-user mr-3"></span> Scan</a>
 	          </li>
 	          <li>
               <a href="#"><span class="fa fa-briefcase mr-3"></span> Target</a>
@@ -37,9 +37,15 @@
 	          </li>
 
 	          <li>
-              <a href="{% url 'VulnResults' %}"><span class="fa fa-cogs mr-3"></span> Results</a>
+              <a href="{% url 'VulnResults' %}"><span class="fa fa-cogs mr-3"></span> Vulnerabilities</a>
 	          </li>
 	          <li>
+
+              <li>
+                <a href="{% url 'VulnResults' %}"><span class="fa fa-cogs mr-3"></span> Results</a>
+              </li>
+              <li>
+
               <a href="#"><span class="fa fa-paper-plane mr-3"></span> Contacts</a>
 	          </li>
 	        </ul>
@@ -47,13 +53,20 @@
 
 	      </div>
     	</nav>
+      <div id="content" class="p-4 p-md-5 pt-5">
+        <h1>Vulnerability Severity Pie Chart</h1>
+       <br>
 
+      <svg width="700" height="220">
+        <g transform="translate(300, 110)"></g>
+      </svg>
+      <div class="legend"></div>
         <!-- Page Content  -->
       <div id="content" class="p-4 p-md-5 pt-5">
           <h1> Results  </h1>
          <br>
 
-       </header>
+ 
        <!--$%adsense%$-->
        <div class="table-wrap">
         <a href="{% url 'NewTask' %}">New Task</a>
@@ -108,10 +121,7 @@
             </tbody>
         </table>
     </div>
-</div>
-</div>
-</div>
-</section>
+
 
 <script>
 // Change icon on collapse/expand
@@ -124,7 +134,7 @@ $(e.target).prev('tr').find('i').removeClass('fa-chevron-down').addClass('fa-che
 });
 </script>
 		</div>
-
+    <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="{% static 'js/jquery.min.js' %}"></script>
     <script src="{% static 'js/popper.js' %}"></script>
     <script src="{% static 'js/table/bootstrap.min.js' %}"></script>

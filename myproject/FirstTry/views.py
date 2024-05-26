@@ -1,14 +1,15 @@
 import datetime
+from itertools import count
 import time
 from celery import Celery, shared_task
 from django.conf import settings
-from django.forms import ValidationError
 from django.http import HttpResponse, HttpResponseRedirect
 import subprocess
-from .forms import ScheduleForm,ScanForm ,HomeForm , SignupForm , LoginForm , ResultatVulnersForm,ResultatTCPForm, TargetForm, TaskForm   # Assurez-vous d'importer les formulaires
+from django.urls import reverse
+from .forms import CustomScanForm, ResultatsForm, ScheduleForm,ScanForm ,HomeForm , SignupForm , LoginForm , ResultatVulnersForm,ResultatTCPForm, TargetForm, TaskForm   # Assurez-vous d'importer les formulaires
 import xml.etree.ElementTree as ET
-from FirstTry.models import ResultVulners,Scan,Home, ResultatTCP,Schedule, Target
-from django.shortcuts import render
+from FirstTry.models import CustomScriptType, NmapScriptType, ResultVulners,Scan,Home, ResultatTCP,Schedule, Target
+from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth import authenticate, login
 from celery.result import AsyncResult
 import requests
@@ -85,14 +86,6 @@ def home(request):
     return render(request,"hello/DisplayScans.html",{'data': data})
 
 
-def index(request):
-    return render(request,"hello/Home.html")
-
-
-def indexwithout(request):
-    time.sleep(10)
-    return render(request,"hello/Home.html")
-
 def AddTask(request):
     schedule = Schedule.objects.all()
     targets = Target.objects.all()
@@ -114,9 +107,54 @@ def AddTarget(request):
         # Handle the case when there's no referrer
             return HttpResponse("No referrer found.")
     else:
-        form = ScanForm()
+        form = TargetForm()
 
     return render(request , 'hello/NewTarget.html',{'form': form})
+
+def AddScan(request):
+    scripts = NmapScriptType.objects.all()
+    custom_scripts = CustomScriptType.objects.all()
+    data = CustomScriptType.objects.all()
+    print(data)
+    if request.method == 'POST':
+        form = ScanForm(request.POST)
+        
+        if not form.is_valid():
+            print(form.errors)  # This will print a dictionary of errors
+        # Iterate through errors and display user-friendly messages
+            for field, error_list in form.errors.items():
+                for error in error_list:
+                    print(f"Error in field '{field}': {error}")
+            return HttpResponse("form n'est pas valid")
+        else:
+            form.save()
+            return redirect(reverse('NewTask'))
+    else:
+        form = ScanForm()
+
+    return render(request , 'hello/NewScanConf.html',{'form': form , 'nmap_script_types':scripts, 'custom_scripts':custom_scripts})
+
+def AddCustomScan(request):
+    scripts = NmapScriptType.objects.all()
+    
+    if request.method == 'POST':
+        form = CustomScanForm(request.POST)
+        if not form.is_valid():
+            print(form.errors)  # This will print a dictionary of errors
+        # Iterate through errors and display user-friendly messages
+            for field, error_list in form.errors.items():
+                for error in error_list:
+                    print(f"Error in field '{field}': {error}")
+            return HttpResponse("form n'est pas valid")
+        else:
+            form.save()
+            return redirect(reverse('NewScanConf'))
+         
+    else:
+        form = CustomScanForm()
+
+    return render(request , 'hello/NewCustomScanConf.html',{'form': form , 'nmap_script_types':scripts})
+
 @shared_task
 def runCommand(scanForm) :
     
@@ -256,7 +294,8 @@ def your_view(request):
 
         task_data_serializable = {
                 'name': scanForm['name'].value(),
-                'target': target_instance.Address_IP,  
+                'target': target_instance.Address_IP,
+                'target_name': target_instance.Target_Name,  
                 'Configuration': scan_configuration_instance.Scan_Name, 
                 'schedule': schedule_id,  
             }
@@ -327,35 +366,6 @@ def AddSchedule(request):
 
     return render(request , 'hello/NewSchedule.html',{'form': form})
 
-def check_task_result(request):
-    # Get the task ID from the session or database
-    task_id = request.session.get('task_id')
-    # or
-    # task_id = YourModel.objects.get(...).task_id
-
-    if task_id:
-        task = AsyncResult(task_id)
-        if task.ready():
-            task_result = task.get()
-            # Process the result and display a notification
-            notification = {
-                'status': 'success',
-                'message': 'Scan completed successfully.',
-                'result': task_result
-            }
-        else:
-            # Task is not yet completed
-            notification = {
-                'status': 'pending',
-                'message': 'Scan is still in progress. Please wait.'
-            }
-    else:
-        notification = {
-            'status': 'error',
-            'message': 'No task found.'
-        }
-
-    return JsonResponse(notification)
 
 def get_vulnerability_details(cve_id):
     try:
@@ -523,6 +533,7 @@ def scheduled_periodic_scan(scanForm):
                             'is_exploit': result.get('is_exploit', False),
                             'description': result.get('details', "Pas de description"),
                     })
+
                     if not resultats.is_valid():
                         print(resultats.errors)  # This will print a dictionary of errors
             # Iterate through errors and display user-friendly messages
@@ -530,7 +541,25 @@ def scheduled_periodic_scan(scanForm):
                             for error in error_list:
                                 print(f"Error in field '{field}': {error}")
                     else:
-                        resultats.save()
+                        results.save()
+
+                    results = ResultatsForm({
+                            'vulnerability': result.get('nameVuln', 'N/A'),
+                            'severity': result.get('cvss', 0.0),
+                            'is_exploit': result.get('is_exploit', False),
+                            'description': result.get('details', "Pas de description"),
+                            'Host_IP': scanForm.get("target"),
+                            'Host_Name': scanForm.get("target_name"),
+                            'Task': scanForm.get("name"),
+                    })
+                    if not results.is_valid():
+                        print(results.errors)  # This will print a dictionary of errors
+            # Iterate through errors and display user-friendly messages
+                        for field, error_list in results.errors.items():
+                            for error in error_list:
+                                print(f"Error in field '{field}': {error}")
+                    else:
+                        results.save()
 
                 
             case "TCP Ping":
@@ -556,4 +585,57 @@ def scheduled_periodic_scan(scanForm):
 def ShowScans(request):
     Scans = Scan.objects.all()
 
-    return render(request, "Hello/ShowScans.html", {'scans' : Scans})
+    return render(request, "hello/ShowScans.html", {'scans' : Scans})
+
+def addScan(request):
+    if request.method == 'POST':
+        form = ScanForm(request.POST)
+        if form.is_valid():
+            form.save()
+            Scans = Scan.objects.all()
+            return render(request, "hello/ShowScans.html", {'scans' : Scans})
+        else:
+            return HttpResponse("Scan n'est pas ajouté")
+
+
+def delete_row(request, row_id):
+    row = get_object_or_404(Scan, id=row_id)
+    if request.method == 'POST':
+        row.delete()
+        Scans = Scan.objects.all()
+        return render(request, "hello/ShowScans.html", {'scans' : Scans})
+    else:
+        return HttpResponse("Scan n'est pas supprimé")
+    
+def vulnerability_data(request):
+    data = {
+        'low': ResultVulners.objects.filter(severity__lt=3).count(),
+        'medium': ResultVulners.objects.filter(severity__gte=3, severity__lt=8).count(),
+        'high': ResultVulners.objects.filter(severity__gte=8).count()
+    }
+
+    return JsonResponse(data)
+
+
+def edit_rowScan(request):
+    Scans = Scan.objects.all()
+    if request.method == 'POST':
+        form = ScanForm(request.POST)
+        try:
+            print("enter 1")
+            row = Scan.objects.get(Scan_Name=form["Scan_Name"].value)
+        except Scan.DoesNotExist:
+            row = None    
+        except Scan.MultipleObjectsReturned:
+            rows = Scan.objects.filter(Scan_Name=form["Scan_Name"].value)
+            row = rows.first()
+        form = ScanForm(request.POST, instance=row)    
+        if form.is_valid():
+            form.save()
+            print("enter form is saved")
+            Scans = Scan.objects.all()
+            return render(request, "hello/ShowScans.html", {'scans' : Scans})# Redirect to your table view after saving
+    else:
+        print("enter 2")
+        form = ScanForm(instance=row)
+    return render(request, "hello/ShowScans.html", {'scans': Scans})

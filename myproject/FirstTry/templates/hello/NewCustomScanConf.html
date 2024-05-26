@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8">
+    <title> Adding New Target | Brahim/Hamza </title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   </head>
+<body>
+  <div class="container">
+    <div class="title">New Scan Configuration</div>
+    <div class="content">
+      <form action="{% url 'NewCustomScanConf' %}" method="post">
+        {% csrf_token %}
+
+        <div class="user-details">
+          <div class="input-box">
+            <span class="details">Name Of Scan</span>
+            <input type="text" name="Script_Name"   placeholder="Enter Scan's name" required>
+          </div>
+         
+          <div class="input-box">
+            <span for="script-type">Select Nmap Script Type:</span> 
+            {% for script_type in nmap_script_types %}
+            <div class="styled-checkbox">
+            <input type="checkbox" name="scan_type" value="{{ script_type.id }}">
+            <label for="{{ script_type.name}}">{{ script_type.name }}</label>  
+          </div>
+            {% endfor %}
+          
+        </div>
+        </div> 
+        
+    
+        <div class="button">
+          <input type="submit" value="Register">
+        </div>
+      </form>
+    </div>
+  </div>
+
+</body>
+</html>

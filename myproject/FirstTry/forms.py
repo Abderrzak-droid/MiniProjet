@@ -1,6 +1,6 @@
 from django.forms import ModelForm
 from . import models
-from .models import Scan, Target 
+from .models import CustomScriptType, NmapScriptType, Resultats, Scan, Target 
 from .models import ResultVulners,Home,ResultatTCP,Schedule,Task
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
@@ -19,12 +19,28 @@ class ScanForm(ModelForm):
   class Meta:
     model = Scan
     fields = ('Scan_Name','scan_type',)
-    
+
+  
+class CustomScanForm(ModelForm):
+  script_types = forms.ModelMultipleChoiceField(
+        queryset=NmapScriptType.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        required=False
+    )
+
+  class Meta:
+    model = CustomScriptType
+    fields = ('Script_Name','script_types',)
 class ResultatVulnersForm(ModelForm):
   class Meta:
     model = ResultVulners
-    fields = ('vulnerability', 'severity','type','is_exploit',)
+    fields = ('vulnerability', 'severity','type','is_exploit','description',)
 
+
+class ResultatsForm(ModelForm):
+  class Meta:
+    model = Resultats
+    fields = ('vulnerability', 'severity','is_exploit','description','Host_IP','Host_Name','Task',)
 
 class TaskForm(ModelForm):
   class Meta:

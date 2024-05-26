@@ -36,4 +36,4 @@ def get_vulnerability_details(cve_id):
         print(f"Error: Unexpected JSON structure. {e}")
 
 #print(parseNmapXmlCaseVulners("output.xml"))
-print(get_vulnerability_details("CVE-2019-1010218"))
+print(get_vulnerability_details("CVE-2004-2687"))

@@ -67,6 +67,17 @@
     }
   }
 }
+path {
+	fill: orange;
+	stroke: white;
+}
+text {
+  font-family: "Helvetica Neue", Helvetica, sans-serif;
+  font-size: 12px;
+  font-weight: bold;
+  fill: white;
+  text-anchor: middle;
+}
 
 @-webkit-keyframes indeterminate {
   0% {
@@ -258,7 +269,25 @@ img {
 svg {
   overflow: hidden;
   vertical-align: middle; }
+svg {
+    border: 1px solid #ccc;
+}
+.legend {
 
+    overflow: hidden;
+    vertical-align: middle;
+}
+.legend div {
+    margin-right: 10px;
+    display: flex;
+    align-items: center;
+}
+.legend div span {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+}
 table {
   border-collapse: collapse; }
 

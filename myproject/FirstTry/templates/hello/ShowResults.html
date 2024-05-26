@@ -1,35 +1,63 @@
-
-<!DOCTYPE html>
+{% load static %}
+<!doctype html>
 <html lang="en">
-   <head>
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1">
-      <meta name="author" content="CodeHim">
-      <title> Résultats du scan Nmap </title>
-      <!-- Style CSS -->
-      {% load static %}
-      <link rel="stylesheet" href="{% static 'style2.css' %}">
-      <!-- Demo CSS (No need to include it into your project) -->
-      
-      <!-- Bootstrap 5 CSS -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
-<!-- Data Table CSS -->
-<link rel='stylesheet' href='https://cdn.datatables.net/1.13.5/css/dataTables.bootstrap5.min.css'>
-<!-- Font Awesome CSS -->
-<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css'>
-   </head>
-   <body>
-      <header class="cd__intro">
-         <h1> Résultats du scan Nmap </h1>
-        <br>
-        <div class="cd__action">
-            <a href="{%url 'home'%}" title="Back to Home" class="cd__btn back">Back to Home</a>
-         </div>
-      </header>
-      <!--$%adsense%$-->
-      <main class="cd__main">
+  <head>
+  	<title>Dashboard EMP VAS</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900" rel="stylesheet">
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+		<link rel="stylesheet" href="{% static 'css/dashboard/style.css' %}">
+  </head>
+  <body >
+		
+		<div class="wrapper d-flex align-items-stretch">
+			<nav id="sidebar">
+				<div class="custom-menu">
+					<button type="button" id="sidebarCollapse" class="btn btn-primary">
+	          <i class="fa fa-bars"></i>
+	          <span class="sr-only">Toggle Menu</span>
+	        </button>
+        </div>
+				<div class="p-4">
+		  		<h1><a href="index.html" class="logo">EMP VAS <span>Dashboard</span></a></h1>
+	        <ul class="list-unstyled components mb-5">
+	          <li class="active">
+	            <a href="{%url 'index' %}"><span class="fa fa-home mr-3"></span> Home</a>
+	          </li>
+	          <li>
+	              <a href="{% url 'Scans' %}"><span class="fa fa-user mr-3"></span> Scan</a>
+	          </li>
+	          <li>
+              <a href="#"><span class="fa fa-briefcase mr-3"></span> Target</a>
+	          </li>
+	          <li>
+              <a href="#"><span class="fa fa-sticky-note mr-3"></span> Schedule</a>
+	          </li>
+
+	          <li>
+              <a href="{% url 'VulnResults' %}"><span class="fa fa-cogs mr-3"></span> Vulnerabilities</a>
+	          </li>
+	          <li>
+
+              <li>
+                <a href="{% url 'VulnResults' %}"><span class="fa fa-cogs mr-3"></span> Results</a>
+              </li>
+              <li>
+              <a href="#"><span class="fa fa-paper-plane mr-3"></span> Contacts</a>
+	          </li>
+	        </ul>
+
+
+	      </div>
+    	 </nav>
+
+
+       <!--$%adsense%$-->
+       <div class="table-wrap" style="padding-left: 100px; width: 100%;">
          <!-- Start DEMO HTML (Use the following code into your project)-->
-         <table id="example" class="table table-striped" style="width:100%">
+         <table id="example" class="table table-striped" >
             <thead>
                 <tr>
                     <th>Vulnerability</th>
@@ -52,8 +80,8 @@
             </tbody>
         </table>
          <!-- END EDMO HTML (Happy Coding!)-->
-      </main>
-      
+        </div>
+      </div>
       <!-- jQuery -->
 <script src='https://code.jquery.com/jquery-3.7.0.js'></script>
 <!-- Data Table JS -->
@@ -61,7 +89,20 @@
 <script src='https://cdn.datatables.net/responsive/2.1.0/js/dataTables.responsive.min.js'></script>
 <script src='https://cdn.datatables.net/1.13.5/js/dataTables.bootstrap5.min.js'></script>
       <!-- Script JS -->
-      <script src="{% static 'js/script.js' %}"></script>
+
       <!--$%analytics%$-->
-   </body>
+      <script src="{% static 'js/main.js' %}"></script>
+      
+      <script src="{% static 'js/script.js' %}"></script>
+  </body>
 </html>
+
+
+
+
+
+
+
+
+
+     
