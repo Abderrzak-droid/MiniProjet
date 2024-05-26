@@ -45,7 +45,7 @@ class ResultatsForm(ModelForm):
 class TaskForm(ModelForm):
   class Meta:
     model = Task
-    fields = ('name','target', 'schedule','Configuration')
+    fields = ('name','target', 'schedule','Configuration','checkbox',)
 
 class ResultatTCPForm(ModelForm):
   class Meta:
@@ -65,4 +65,4 @@ class TargetForm(ModelForm):
 class ScheduleForm(ModelForm):
   class Meta:
     model = Schedule
-    fields = ('Schedule_Name', 'recurrence', 'start_time',)
+    fields = ('Schedule_Name', 'recurrence', 'start_time','run_until','open_end',)
