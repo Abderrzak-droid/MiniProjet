@@ -22,7 +22,8 @@
           <div class="input-box">
             <span class="details">Reccurence :</span>
             <select id="recurrence" name="recurrence">
-                <option value="none">Une seule fois</option>
+                <option value="hourly">Hourly</option>
+                <option value="one">Only Once</option>
                 <option value="daily">Quotidienne</option>
                 <option value="weekly">Hebdomadaire</option>
                 <option value="monthly">Mensuelle</option>
@@ -35,16 +36,36 @@
             <input type="datetime-local" id="start_time" name="start_time" >
             <button type="button" id="nowButton">Now</button>
           </div>
+          <div class="input-box">
+            <span class="details">Run Until </span>
+            <input type="date" id="run_until" name="run_until" >
+            <div class="input-box">
+            <label for="open_end">Open End</label>
+            <input type="checkbox" id="open_end" name="open_end" checked>
+          </div>
                 <!-- Hidden input to store the current time -->
                 <input type="hidden" id="currentTime" name="currentTime">
         </div>  
-
+      </div>
         <div class="button">
           <input type="submit" value="Register">
         </div>
       </form>
 
+      <script>
+        function toggleDateTimeInput() {
+            var dateTimeInput = document.getElementById('run_until');
+            var openEndCheckbox = document.getElementById('open_end');
+            dateTimeInput.disabled = openEndCheckbox.checked;
+        }
 
+        window.onload = function() {
+            toggleDateTimeInput();  // Set initial state based on checkbox
+            document.getElementById('open_end').addEventListener('change', toggleDateTimeInput);
+        };
+    </script>
+    
+    
     <script>
         document.getElementById('nowButton').addEventListener('click', function() {
             var now = new Date();

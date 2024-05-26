@@ -1,4 +1,5 @@
 import datetime
+from io import BytesIO
 from itertools import count
 import time
 from celery import Celery, shared_task
@@ -14,6 +15,8 @@ from django.contrib.auth import authenticate, login
 from celery.result import AsyncResult
 import requests
 from django.utils import timezone
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
 # Create your views here.
 
 
@@ -230,7 +233,7 @@ def create_task(request):
         # If it's not a POST request, create a blank form
         form = TaskForm()
     return render(request, 'hello/test.html', {'form': form})
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 
 def your_view(request):
 
@@ -294,10 +297,11 @@ def your_view(request):
 
         task_data_serializable = {
                 'name': scanForm['name'].value(),
-                'target': target_instance.Address_IP,
-                'target_name': target_instance.Target_Name,  
+                'target': target_instance.Address_IP,  
                 'Configuration': scan_configuration_instance.Scan_Name, 
                 'schedule': schedule_id,  
+                'recurrence': date.recurrence,
+                'rununtil':date.run_until,
             }
         
         scan_datetime = date.start_time
@@ -312,36 +316,31 @@ def your_view(request):
             # must be revised
             minutes = current_minutes
 
+        time_diff = (scan_datetime - current_datetime).total_seconds()
 
-        if minutes == current_minutes or schedule_name =="Now":
-            ports_info_result = scheduled_periodic_scan.apply_async(args=(task_data_serializable,))
-        else:
-            if scan_datetime >= current_datetime:
-                time_diff = (scan_datetime - current_datetime).total_seconds()
+        print("Waiting for initial scheduled scan at:", scan_datetime.strftime("%Y-%m-%d %H:%M:%S"))
+        print("Time left:", timedelta(seconds=time_diff))
 
-                #pour la fonction périodique.
-                time_diff_period = (scan_datetime+ timedelta(days=d) - datetime.now(timezone.utc)).total_seconds()
+        target=target_instance.Address_IP
 
+        print("target is : ",target)
+        print("current:", current_datetime.strftime("%Y-%m-%d %H:%M:%S"))
 
-                print("Waiting for initial scheduled scan at:", scan_datetime.strftime("%Y-%m-%d %H:%M:%S"))
-                print("Time left:", timedelta(seconds=time_diff))
-
-                target=target_instance.Address_IP
-
-                print("target is : ",target)
-                print("current:", current_datetime.strftime("%Y-%m-%d %H:%M:%S"))
+        if 'checkbox' in request.POST:
+            ports_info_result1 = scheduled_periodic_scan.apply_async(args=(task_data_serializable,))
+        if scan_datetime >= current_datetime:
+                
                 #periodic_scan(task_data_serializable)
-                ports_info_result = scheduled_periodic_scan.apply_async(args=(task_data_serializable,), countdown=time_diff)
+            ports_info_result = scheduled_periodic_scan.apply_async(args=(task_data_serializable,), countdown=time_diff)
 
-            else:
-                return HttpResponse("probleme du temps.")
+        else:
+            return HttpResponse("probleme du temps.")
         
         data = Home.objects.all()
         return render(request,'hello/dashboard.html',{'data': data}) # Redirect to status polling view
     else:   
         print(scanForm.errors)
         return HttpResponse("scan n'est pas valide")
-
 # views.py
 from django.http import JsonResponse
 def AddSchedule(request):
@@ -489,9 +488,9 @@ def parseNmapXmlCaseTcpPing(xml_file):
 
 @shared_task
 def scheduled_periodic_scan(scanForm):
-        
+    
         print("Initial scheduled scan started at:", datetime.now())
-        
+        recurrence = scanForm.get("recurrence")
         scan_type = scanForm.get("Configuration")
         print("le type est :",scan_type)
 
@@ -533,7 +532,6 @@ def scheduled_periodic_scan(scanForm):
                             'is_exploit': result.get('is_exploit', False),
                             'description': result.get('details', "Pas de description"),
                     })
-
                     if not resultats.is_valid():
                         print(resultats.errors)  # This will print a dictionary of errors
             # Iterate through errors and display user-friendly messages
@@ -541,25 +539,7 @@ def scheduled_periodic_scan(scanForm):
                             for error in error_list:
                                 print(f"Error in field '{field}': {error}")
                     else:
-                        results.save()
-
-                    results = ResultatsForm({
-                            'vulnerability': result.get('nameVuln', 'N/A'),
-                            'severity': result.get('cvss', 0.0),
-                            'is_exploit': result.get('is_exploit', False),
-                            'description': result.get('details', "Pas de description"),
-                            'Host_IP': scanForm.get("target"),
-                            'Host_Name': scanForm.get("target_name"),
-                            'Task': scanForm.get("name"),
-                    })
-                    if not results.is_valid():
-                        print(results.errors)  # This will print a dictionary of errors
-            # Iterate through errors and display user-friendly messages
-                        for field, error_list in results.errors.items():
-                            for error in error_list:
-                                print(f"Error in field '{field}': {error}")
-                    else:
-                        results.save()
+                        resultats.save()
 
                 
             case "TCP Ping":
@@ -576,10 +556,77 @@ def scheduled_periodic_scan(scanForm):
                     )
 
                     vulnerability.save()
-
-
+        download_report( 'pdf', scan_type, ports_info)
+        # Conversion de date en datetime
+        if recurrence != "one" and  scanForm.get("rununtil") >= date.today() :
+            periodique(recurrence , scanForm)
 
         return ports_info
+
+def periodique(val , scanForm) :
+    if val == "daily":
+            d = 1
+    elif val == "weekly":
+            d = 7
+    elif val == "yearly":
+            d = 365
+    elif val == "monthly":
+            d = 30
+    elif val == "hourly" :
+            # Définir la durée en heures
+            h = 1  # par exemple, 48 heures
+
+# Convertir les heures en jours
+            d = h / 24
+            
+    #pour la fonction périodique.
+    time_diff_period = (timedelta(days=d)).total_seconds()
+    print ("le prochaine scan sera apres ", time_diff_period)
+    scheduled_periodic_scan.apply_async(args=(scanForm,), countdown=time_diff_period)
+
+def generate_pdf_report(scan_type, ports_info):
+    buffer = BytesIO()
+    c = canvas.Canvas(buffer, pagesize=letter)
+    c.setFont("Helvetica", 12)
+
+    c.drawString(100, 750, f"Scan Report - {scan_type}")
+    c.drawString(100, 735, f"Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    y = 700
+    
+    for info in ports_info:
+        for key, value in info.items():
+            c.drawString(100, y, f"{key}: {value}")
+            y -= 15
+            if y < 50:
+                c.showPage()
+                c.setFont("Helvetica", 12)
+                y = 750
+
+    c.save()
+    pdf = buffer.getvalue()
+    buffer.close()
+    return pdf
+
+def download_report(format, scan_type, ports_info):
+    if format == 'pdf':
+        pdf = generate_pdf_report(scan_type, ports_info)
+        response = HttpResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="scan_report_{scan_type}_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf"'
+        return response
+    elif format == 'xml':
+        response = HttpResponse(content_type='application/xml')
+        response['Content-Disposition'] = f'attachment; filename="scan_report_{scan_type}_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xml"'
+        xml_content = '<report>'
+        for info in ports_info:
+            xml_content += '<port_info>'
+            for key, value in info.items():
+                xml_content += f'<{key}>{value}</{key}>'
+            xml_content += '</port_info>'
+        xml_content += '</report>'
+        response.write(xml_content)
+        return response
+    else:
+        return HttpResponse("Unsupported format", status=400)
 
 
 def ShowScans(request):
@@ -637,5 +684,5 @@ def edit_rowScan(request):
             return render(request, "hello/ShowScans.html", {'scans' : Scans})# Redirect to your table view after saving
     else:
         print("enter 2")
-        form = ScanForm(instance=row)
+        form = ScanForm()
     return render(request, "hello/ShowScans.html", {'scans': Scans})

@@ -1,3 +1,4 @@
+from datetime import date
 from django.db import models
 from django.utils import timezone
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -34,14 +35,18 @@ class Schedule(models.Model):
     Schedule_Name = models.CharField(max_length=20)
     
     RECURRENCE_CHOICES = (
+        ("hourly","Hourly"),
         ("monthly", "Mensuelle"),
         ("daily", "Quotidienne"),
         ("weekly", "Hebdomadaire"),
         ("yearly", "Annuelle"),
-        ("none", "Une seule fois"),
+        ("one", "Only Once"),
     )
     recurrence = models.CharField(max_length=15, choices=RECURRENCE_CHOICES, default="none")
     start_time = models.DateTimeField(default=timezone.now)
+    run_until = models.DateField(default=date.today)
+    open_end = models.BooleanField(default=True)
+
 
 class ScanPorts(models.Model):
     scan_id = models.PositiveIntegerField()
@@ -102,6 +107,7 @@ class Home(models.Model):
     status = models.CharField(max_length=20)
     Configuration = models.CharField(max_length=20)
     Creation_Time = models.DateTimeField(default=timezone.now)
+
     schedule = models.CharField(max_length=30)
 
 class User(models.Model):
@@ -114,4 +120,4 @@ class Task(models.Model):
     target = models.ForeignKey(Target, on_delete=models.CASCADE)
     Configuration = models.ForeignKey(Scan, on_delete=models.CASCADE)
     schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE)
-
+    checkbox = models.BooleanField(default=False) 

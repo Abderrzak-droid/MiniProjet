@@ -22,5 +22,7 @@ urlpatterns =[
     path('Scans', views.ShowScans, name='Scans'),
     path('editScan', views.edit_rowScan, name='edit_Scanrow'),
     path('deleteScan?<int:row_id>', views.delete_row, name='delete_row'),
-   
+
+    # Other URL patterns
+    #path('download_report?<string:format>', views.download_report, name='download_report'),
 ]

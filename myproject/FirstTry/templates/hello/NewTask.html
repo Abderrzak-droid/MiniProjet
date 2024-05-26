@@ -36,18 +36,23 @@
           <span class="input-title">Schedule</span>  <a href="{%url 'NewSchedule' %}"> New Schedule</a>
           
           <select name="schedule" id="id_schedule" required>
-            <option value="Now">Now</option>
+            <option value="Now">None</option>
             {% for choice in choices %}
             <option value="{{ choice.id }}">
                 {{ choice.Schedule_Name }} 
             </option>
             {% endfor %}
         </select>
-       
+        <br>
+        <p>Please check if you want to perform the scan now</p>
+        <div class="input-box">
+        <input type="checkbox" id="id_schedule" name="checkbox" value="Now" >
+        <label for="id_schedule" >Now</label>
+ </div>
       </div>
       
           <div class="input-box">
-            <span class="details">Scan Configuration</span>  <a href="{%url 'NewScanConf' %}">New Scan Conf</a>
+            <span class="input-title">Scan Configuration</span>  <a href="{%url 'NewScanConf' %}">New Scan Conf</a>
           
             <select name="Configuration" id="id_Configuration">
               {% for choice in scans %}
